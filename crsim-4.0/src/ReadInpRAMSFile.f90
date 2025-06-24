@@ -2067,10 +2067,10 @@
       dim_names(iDim)   = name
       dim_lengths(iDim) = length
       !
-      Select Case (name)
-      Case ('ni')        ;  str%nx    = length
-      Case ('nj')        ;  str%ny    = length
-      Case ('nk')       ;  str%nz    = length
+      Select Case (name) ! ni,nj,nk are for older CM1 compatibility
+      Case ('ni','xh')    ;  str%nx    = length
+      Case ('nj','yh')    ;  str%ny    = length
+      Case ('nk','zh')    ;  str%nz    = length
       Case ('time')       ;  str%nt    = length
       End Select
       !
@@ -2080,6 +2080,8 @@
     str%nxp1  = str%nx
     str%nyp1  = str%ny
     str%nzp1  = str%nz
+    
+    write(0,*) 'ReadInpCM1_dim: nx,ny,nz = ',str%nx,str%ny,str%nz
     
     Deallocate(dim_names,dim_lengths)
     !
@@ -2092,7 +2094,7 @@
     Endif
     !
     If (str%nxp1/=str%nx) then
-       write(*,*) 'Problem in input dimensions nx and nxp1'
+       write(*,*) 'CM1 Problem in input dimensions nx and nxp1',str%nxp1,str%nx
        write(*,*) 'nx=nxp1 for CM1 input'
        Call Exit(1)
     EndIf
@@ -2133,6 +2135,8 @@
     strr%nzp1=str%nzp1
     strr%nxp1=str%nxp1
     strr%nyp1=str%nyp1
+    
+    write(0,*) 'ReadInpCM1_var: nx,ny,nz,nt = ',str%nx,str%ny,str%nz,str%nt,str%nxp1
     !
     call allocate_wrf_rvar(strr)
     call initialize_wrf_rvar(strr)

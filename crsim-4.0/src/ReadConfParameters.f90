@@ -139,6 +139,7 @@ if ( inputline(1:1).ne.'#' ) then
 else
   str%ModelName = 'WRF'
 endif
+write(0,*) 'ModelName = ',str%ModelName
 !
 inputline='#'
 do while (inputline(1:1).eq.'#')

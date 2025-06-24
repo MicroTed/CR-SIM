@@ -349,7 +349,7 @@
       call ReadInpRAMS_dim(trim(conf%WRFInputFile),wrf,status)
     else if ((conf%MP_PHYSICS==70) .or. (conf%MP_PHYSICS==75)) then!read SAM: added by oue to read SAM
       call ReadInpSAM_dim(trim(conf%WRFInputFile),wrf,status)
-    else if (conf%MP_PHYSICS==80) then!read CM1: added by oue to read CM1 (Apr 2020)
+    else if (conf%MP_PHYSICS==80 .or. conf%ModelName == 'CM1' ) then!read CM1: added by oue to read CM1 (Apr 2020)
       call ReadInpCM1_dim(trim(conf%WRFInputFile),wrf,status)
     else
       call ReadInpWRF_dim(trim(conf%WRFInputFile),wrf,status)
@@ -383,7 +383,7 @@
       if((conf%MP_PHYSICS==75) .and. (conf%InpProfile_flag==1)) conf%InputProfile = conf%WRFmpInputFile
       call ReadInpSAM_var(trim(conf%WRFInputFile),trim(conf%InputProfile),wrf,status)
       call get_env_vars_sam(conf,wrf,env)
-    else if (conf%MP_PHYSICS==80) then!read CM1 by oue for CM1 Apr 2020
+    else if (conf%MP_PHYSICS==80 .or. conf%ModelName == 'CM1' ) then!read CM1 by oue for CM1 Apr 2020
       call ReadInpCM1_var(trim(conf%WRFInputFile),wrf,status)
       call get_env_vars_cm1(conf,wrf,env)
     else
@@ -493,10 +493,8 @@
       call allocate_wrf_var_mp18(mp18)
       call initialize_wrf_var_mp18(mp18)
        write(0,*) 'Reading from file: modelname = ',conf%ModelName
-      if ( trim(conf%ModelName) == 'WRF' ) then
+      if ( trim(conf%ModelName) == 'WRF' .or. conf%ModelName == 'CM1' ) then
         call ReadInpWRF_MP_PHYSICS_18(Trim(WRFmpInputFile),mp18,status)
-      elseif ( conf%ModelName == 'CM1' ) then
-!        call ReadInpCM1_MP_PHYSICS_18(Trim(WRFmpInputFile),mp18,status)
       elseif ( conf%ModelName == 'COMMAS' ) then
 !        call ReadInpCOMMAS_MP_PHYSICS_18(Trim(WRFmpInputFile),mp18,status)
 ! convert number, etc. from m^-3 to kg^-1: divide by env%rho_d

@@ -651,15 +651,16 @@
       !
       Select Case (Trim(Adjustl(name)))
       !
-      Case ('QCLOUD')
+      Case ('QCLOUD','qc')
       status=nf90_get_var(ncid,iVar,strr%QCLOUD)
       str%QCLOUD = dble(strr%QCLOUD)
+      write(0,*) 'found qc'
       If (status/=0) Then
         err_msg = 'Error in my_nf90_get_var: QCLOUD'
         Goto 999
       End If
       !
-      Case ('QRAIN')
+      Case ('QRAIN','qr')
       status=nf90_get_var(ncid,iVar,strr%QRAIN)
       str%QRAIN  = dble(strr%QRAIN)
       If (status/=0) Then
@@ -667,7 +668,7 @@
         Goto 999
       End If
       !
-      Case ('QICE')
+      Case ('QICE','qi')
       status=nf90_get_var(ncid,iVar,strr%QICE)
       str%QICE  = dble(strr%QICE)
       If (status/=0) Then
@@ -675,7 +676,7 @@
         Goto 999
       End If
       !
-      Case ('QSNOW')
+      Case ('QSNOW','qs')
       status=nf90_get_var(ncid,iVar,strr%QSNOW)
       str%QSNOW  = dble(strr%QSNOW)
       If (status/=0) Then
@@ -683,7 +684,7 @@
         Goto 999
       End If
       !
-      Case ('QGRAUP')
+      Case ('QGRAUP','qg')
       status=nf90_get_var(ncid,iVar,strr%QGRAUP)
       str%QGRAUP  = dble(strr%QGRAUP)
       If (status/=0) Then
@@ -691,7 +692,7 @@
         Goto 999
       End If
       !
-      Case ('QHAIL')
+      Case ('QHAIL','qhl')
       status=nf90_get_var(ncid,iVar,strr%QHAIL)
       str%QHAIL  = dble(strr%QHAIL)
       If (status/=0) Then
@@ -699,7 +700,7 @@
         Goto 999
       End If
       !
-      Case ('QNDROP') ! NSSL uses qndrop instead of qncloud
+      Case ('QNDROP','ccw') ! NSSL uses qndrop instead of qncloud
       status=nf90_get_var(ncid,iVar,strr%QNCLOUD)
       str%QNCLOUD  = dble(strr%QNCLOUD)
       If (status/=0) Then
@@ -707,7 +708,7 @@
         Goto 999
       End If
       !
-      Case ('QNRAIN')
+      Case ('QNRAIN','crw')
       status=nf90_get_var(ncid,iVar,strr%QNRAIN)
       str%QNRAIN  = dble(strr%QNRAIN)
       If (status/=0) Then
@@ -715,7 +716,7 @@
         Goto 999
       End If
       !
-      Case ('QNICE')
+      Case ('QNICE','cci')
       status=nf90_get_var(ncid,iVar,strr%QNICE)
       str%QNICE  = dble(strr%QNICE)
       If (status/=0) Then
@@ -723,7 +724,7 @@
         Goto 999
       End If
       !
-      Case ('QNSNOW')
+      Case ('QNSNOW','csw')
       status=nf90_get_var(ncid,iVar,strr%QNSNOW)
       str%QNSNOW  = dble(strr%QNSNOW)
       If (status/=0) Then
@@ -731,7 +732,7 @@
         Goto 999
       End If
       !
-      Case ('QNGRAUPEL')
+      Case ('QNGRAUPEL','chw')
       status=nf90_get_var(ncid,iVar,strr%QNGRAUP)
       str%QNGRAUP  = dble(strr%QNGRAUP)
       If (status/=0) Then
@@ -739,7 +740,7 @@
         Goto 999
       End If
       !
-      Case ('QNHAIL')
+      Case ('QNHAIL','chl')
       status=nf90_get_var(ncid,iVar,strr%QNHAIL)
       str%QNHAIL  = dble(strr%QNHAIL)
       If (status/=0) Then
@@ -747,7 +748,7 @@
         Goto 999
       End If
 
-      Case ('QVGRAUPEL')
+      Case ('QVGRAUPEL','vhw')
       status=nf90_get_var(ncid,iVar,strr%QVGRAUP)
       str%QVGRAUP  = dble(strr%QVGRAUP)
       If (status/=0) Then
@@ -755,7 +756,7 @@
         Goto 999
       End If
       !
-      Case ('QVHAIL')
+      Case ('QVHAIL','vhl')
       status=nf90_get_var(ncid,iVar,strr%QVHAIL)
       str%QVHAIL  = dble(strr%QVHAIL)
       If (status/=0) Then
@@ -763,14 +764,14 @@
         Goto 999
       End If
 
-      Case ('QZRAIN')
+      Case ('QZRAIN','zrw')
       status=nf90_get_var(ncid,iVar,strr%QZRAIN)
       str%QZRAIN  = dble(strr%QZRAIN)
       If (status/=0) Then
         err_msg = 'Error in my_nf90_get_var: QZRAIN'
         Goto 999
       End If
-      Case ('QZGRAUPEL')
+      Case ('QZGRAUPEL','zhw')
       status=nf90_get_var(ncid,iVar,strr%QZGRAUP)
       str%QZGRAUP  = dble(strr%QZGRAUP)
       If (status/=0) Then
@@ -778,7 +779,7 @@
         Goto 999
       End If
       !
-      Case ('QZHAIL')
+      Case ('QZHAIL','zhl')
       status=nf90_get_var(ncid,iVar,strr%QZHAIL)
       str%QZHAIL  = dble(strr%QZHAIL)
       If (status/=0) Then
