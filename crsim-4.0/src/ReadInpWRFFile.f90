@@ -654,7 +654,7 @@
       Case ('QCLOUD','qc')
       status=nf90_get_var(ncid,iVar,strr%QCLOUD)
       str%QCLOUD = dble(strr%QCLOUD)
-      write(0,*) 'found qc'
+      ! write(0,*) 'found qc'
       If (status/=0) Then
         err_msg = 'Error in my_nf90_get_var: QCLOUD'
         Goto 999
