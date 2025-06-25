@@ -351,6 +351,8 @@
       call ReadInpSAM_dim(trim(conf%WRFInputFile),wrf,status)
     else if (conf%MP_PHYSICS==80 .or. conf%ModelName == 'CM1' ) then!read CM1: added by oue to read CM1 (Apr 2020)
       call ReadInpCM1_dim(trim(conf%WRFInputFile),wrf,status)
+    else if ( conf%ModelName == 'COMMAS' ) then ! read COMMAS:
+      call ReadInpCOMMAS_dim(trim(conf%WRFInputFile),wrf,status)
     else
       call ReadInpWRF_dim(trim(conf%WRFInputFile),wrf,status)
     endif
@@ -386,6 +388,9 @@
     else if (conf%MP_PHYSICS==80 .or. conf%ModelName == 'CM1' ) then!read CM1 by oue for CM1 Apr 2020
       call ReadInpCM1_var(trim(conf%WRFInputFile),wrf,status)
       call get_env_vars_cm1(conf,wrf,env)
+    else if (conf%ModelName == 'COMMAS' ) then!read CM1 by oue for CM1 Apr 2020
+      call ReadInpCOMMAS_var(trim(conf%WRFInputFile),wrf,status)
+      call get_env_vars_commas(conf,wrf,env)
     else
       call ReadInpWRF_var(trim(conf%WRFInputFile),wrf,status)
       call get_env_vars(conf,wrf,env)
@@ -496,6 +501,7 @@
       if ( trim(conf%ModelName) == 'WRF' .or. conf%ModelName == 'CM1' ) then
         call ReadInpWRF_MP_PHYSICS_18(Trim(WRFmpInputFile),mp18,status)
       elseif ( conf%ModelName == 'COMMAS' ) then
+        call ReadInpWRF_MP_PHYSICS_18(Trim(WRFmpInputFile),mp18,status)
 !        call ReadInpCOMMAS_MP_PHYSICS_18(Trim(WRFmpInputFile),mp18,status)
 ! convert number, etc. from m^-3 to kg^-1: divide by env%rho_d
       else
