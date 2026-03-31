@@ -899,7 +899,7 @@
       !
       Select Case (Trim(Adjustl(name)))
       !
-      Case ('QCLOUD')
+      Case ('QCLOUD','QC','qc')
       status=nf90_get_var(ncid,iVar,strr%QCLOUD) ; write(*,*) 'QCLOUD is found.'
       str%QCLOUD = dble(strr%QCLOUD)
       If (status/=0) Then
@@ -907,7 +907,7 @@
         Goto 999
       End If
       !
-      Case ('QRAIN')
+      Case ('QRAIN','QR','qr')
       status=nf90_get_var(ncid,iVar,strr%QRAIN) ; write(*,*) 'QRAIN is found.'
       str%QRAIN = dble(strr%QRAIN)
       If (status/=0) Then
@@ -915,7 +915,7 @@
         Goto 999
       End If
       !
-      Case ('QICE')
+      Case ('QICE','QI','qi')
       status=nf90_get_var(ncid,iVar,strr%QICE) ; write(*,*) 'QICE is found.'
       str%QICE = dble(strr%QICE)
       If (status/=0) Then
@@ -923,7 +923,7 @@
         Goto 999
       End If
       !
-      Case ('QSNOW')
+      Case ('QSNOW','QS','qs')
       status=nf90_get_var(ncid,iVar,strr%QSNOW) ; write(*,*) 'QSNOW is found.'
       str%QSNOW = dble(strr%QSNOW)
       If (status/=0) Then
@@ -931,7 +931,7 @@
         Goto 999
       End If
       !
-      Case ('QGRAUP')
+      Case ('QGRAUP','QH','qg')
       status=nf90_get_var(ncid,iVar,strr%QGRAUP) ; write(*,*) 'QGRAUP is found.'
       str%QGRAUP = dble(strr%QGRAUP)
       If (status/=0) Then
@@ -939,7 +939,7 @@
         Goto 999
       End If
       !
-      Case ('QNCLOUD')
+      Case ('QNCLOUD','CCW','ncc')
       status=nf90_get_var(ncid,iVar,strr%QNCLOUD) ; write(*,*) 'QNCLOUD is found.'
       str%QNCLOUD = dble(strr%QNCLOUD)
       If (status/=0) Then
@@ -947,7 +947,7 @@
         Goto 999
       End If
       !
-      Case ('QNRAIN')
+      Case ('QNRAIN','CRW','ncr')
       status=nf90_get_var(ncid,iVar,strr%QNRAIN) ; write(*,*) 'QNRAIN is found.'
       str%QNRAIN = dble(strr%QNRAIN)
       If (status/=0) Then
@@ -955,7 +955,7 @@
         Goto 999
       End If
       !
-      Case ('QNICE')
+      Case ('QNICE','CCI','nci')
       status=nf90_get_var(ncid,iVar,strr%QNICE) ; write(*,*) 'QNICE is found.'
       str%QNICE = dble(strr%QNICE)
       If (status/=0) Then
@@ -963,7 +963,7 @@
         Goto 999
       End If
       !
-      Case ('QNSNOW')
+      Case ('QNSNOW','CSW','ncs')
       status=nf90_get_var(ncid,iVar,strr%QNSNOW) ; write(*,*) 'QNSNOW is found.'
       str%QNSNOW = dble(strr%QNSNOW)
       If (status/=0) Then
@@ -971,7 +971,7 @@
         Goto 999
       End If
       !
-      Case ('QNGRAUPEL')
+      Case ('QNGRAUPEL','CHW','ncg')
       status=nf90_get_var(ncid,iVar,strr%QNGRAUP) ; write(*,*) 'QNGRAUPEL is found.'
       str%QNGRAUP = dble(strr%QNGRAUP)
       If (status/=0) Then
