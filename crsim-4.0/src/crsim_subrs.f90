@@ -1628,7 +1628,7 @@
       k=0.5d0 ; av=71.34d0 ; bv=0.6635d0
     endif
     !
-    if(isc==4) then ! snow; Need to fix this for NSSL
+    if(isc==4) then ! snow; 
       nu=3.d0 ; alpha=-0.4d0
       rhoh=100.d0
       nus = -0.8d0
@@ -1637,12 +1637,8 @@
       !if (snow_spherical==1) then
       !  am=piov6*rhoh ; bm=3.d0     ! for snow spherical
       !else  
-        am=0.069d0 ; bm=2.d0   ! snow not spherical  
-       ! am = 0.1597d0 ; bm = 2.078   !Brandes et al., 2007 (JAMC)
-        ! PROBABLY ERROR IN WRF CODE, am =0.1597d0 is too small,and gives rho=64.6 kg/m^3 fr D=3 mm and rho=23.4 kg/m^3 fr D=9 mm 
-        !  assumed here  am=15.97, and then  rho= 646 kg/m^3 for D=3 mm and rho=234 kg/m^3 for D=9 mm.
-  
-       ! am=1.597d0  ! AT assumed correct value 
+        am=0.069d0 ; bm=2.d0   ! Cox 1988 QJRMS
+       ! am = 0.1597d0 ; bm = 2.078   ! alternate Brandes et al., 2007 (JAMC)
         a_rhoh=am/piov6; b_rhoh=bm-3.d0 ! rhoh = 6/pi am D^(bm-3) -> the bulk density of a sphere with the equivalent mass
                                         ! rhoh = a_rhoh * D^(b_rhoh)  
    
@@ -1732,7 +1728,7 @@
     NN(ir) = am*bm*diam(ir)**(bm-1.0)*(dexp(-((am*diam(ir)**bm*gamma_nup2)/(gamma_nup1*xbar)))*ntx*   &
            (gamma_nup1/gamma_nup2)**(-nus-1)*((am*diam(ir)**bm)/xbar)**nus)/(gamma_nup1*xbar)
     NN(ir) = ddiam*NN(ir)
-    masstot = masstot + nn(ir)*am*diam(ir)**bm
+!    masstot = masstot + nn(ir)*am*diam(ir)**bm
       fvel(ir) = av * (diam(ir))**bv * fck  ! m/s
     enddo
 !      IF ( qhydro*rho_d > 0.001 ) THEN
@@ -1741,7 +1737,7 @@
 !        write(6,*) 'ir,dia,rhos = ',ir,diam(ir),rho(ir),nn(ir)
 !        enddo
 !      ENDIF
-    ELSE
+    ELSE ! not snow and is spherical with constant density
     do ir=1,nd
       NN(ir)=qnhydro*rho_d * nu/gamma_alphap1 * lambda(ir)**(nu*alphap1) * &
              diam(ir)**(nu*alphap1-1.d0)*dexp(-(lambda(ir)*diam(ir))**nu) ! 1/m^4
