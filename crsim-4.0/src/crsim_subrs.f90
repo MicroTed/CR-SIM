@@ -354,18 +354,14 @@
     Allocate(zhh_d(nd),zvh_d(nd),zvv_d(nd)) ! used for Doppler spectra simulation
     zhh_d=0.d0 ; zvh_d=0.d0 ; zvv_d=0.d0  
     !------------------------------------------------------------------------------------
-!     IF ((conf%MP_PHYSICS==9).and.(isc==4).and.(conf%snow_spherical/=1)) THEN
-!       ! when hydrometeor density changes with size
-!       call GetPolarimetricInfofromLUT(isc,conf,elev,ww,temp,nd,diam,NN,rho,fvel,Zhh,Zvv,Zvh,RHOhvc,&
-!                                       DVh,dDVh,Dopp,Kdp,Adp,Ah,Av,diff_back_phase,zhh_d,zvh_d,zvv_d)
-!     ELSE IF ((conf%MP_PHYSICS==8).and.(isc==4)) THEN
-!       ! when hydrometeor density changes with size
-!       call GetPolarimetricInfofromLUT(isc,conf,elev,ww,temp,nd,diam,NN,rho,fvel,Zhh,Zvv,Zvh,RHOhvc,&
-!                                       DVh,dDVh,Dopp,Kdp,Adp,Ah,Av,diff_back_phase,zhh_d,zvh_d,zvv_d)
-!     ELSE ! density of hydrometeor doesn't change with size
+      IF ( isc == 4 )  THEN
+     ! snow density changes with size
+      call GetPolarimetricInfofromLUT(isc,conf,elev,ww,temp,nd,diam,NN,rho,fvel,Zhh,Zvv,Zvh,RHOhvc,&
+                                      DVh,dDVh,Dopp,Kdp,Adp,Ah,Av,diff_back_phase,zhh_d,zvh_d,zvv_d)
+      ELSE ! density of hydrometeor doesn't change with size
       call GetPolarimetricInfofromLUT_cdws(isc,conf,elev,ww,temp,nd,diam,NN,rho(1),fvel,Zhh,Zvv,Zvh,RHOhvc,&
                                       DVh,dDVh,Dopp,Kdp,Adp,Ah,Av,diff_back_phase,zhh_d,zvh_d,zvv_d)
-!     ENDIF
+      ENDIF
     !
     !=======================================================!
     !-- Simulate Doppler spectrum---------------------------!
@@ -1586,7 +1582,10 @@
   real*8                               :: a_rhoh, b_rhoh ! coefficients in relations rhoh = a_rhoh * D^(b_rhoh), 
                                                          ! or  rhoh = 6/pi am D^(bm-3) where rhoh is the bulk density of a sphere 
                                                          ! with the mass equivalent to the mass of a particle with m=am D^m
-  
+  real*8  :: nus, gamma_nup1, gamma_nup2 ! gamma(nus+1)
+  real*8  :: ntx,xbar,masstot
+  logical :: lfirst = .true.
+  integer :: ithread
     ! generalized gamma distribution function 
       ! N(D)=Nt nu/G(1+alpha) lambda^[nu(1+alpha)]  D^[nu(1+alpha)-1]  exp[ -(lambda D)^nu]
     ! lambda=the slope; nu=the dispersion parameter; alpha the shape parameter where
@@ -1630,12 +1629,16 @@
     endif
     !
     if(isc==4) then ! snow; Need to fix this for NSSL
-      nu=3.d0 ; alpha=1.d0
+      nu=3.d0 ; alpha=-0.4d0
       rhoh=100.d0
+      nus = -0.8d0
+      gamma_nup1 = dgamma(nus+1.)
+      gamma_nup2 = dgamma(nus+2.)
       !if (snow_spherical==1) then
       !  am=piov6*rhoh ; bm=3.d0     ! for snow spherical
       !else  
         am=0.069d0 ; bm=2.d0   ! snow not spherical  
+       ! am = 0.1597d0 ; bm = 2.078   !Brandes et al., 2007 (JAMC)
         ! PROBABLY ERROR IN WRF CODE, am =0.1597d0 is too small,and gives rho=64.6 kg/m^3 fr D=3 mm and rho=23.4 kg/m^3 fr D=9 mm 
         !  assumed here  am=15.97, and then  rho= 646 kg/m^3 for D=3 mm and rho=234 kg/m^3 for D=9 mm.
   
@@ -1701,8 +1704,12 @@
     ! rho does not depend on the size so in fact lambda doesn't need to have
     ! dimension nd
     rho(:)=rhoh  ! if the hydrometeor density is the same for all sizes
-    if ((isc==4).and.(snow_spherical/=1)) rho(:)=a_rhoh*diam(:)**b_rhoh ! the hydr. density changes with the size
-   
+    if ((isc==4).and.(snow_spherical/=1)) THEN 
+      do ir=1,nd
+        rho(ir)= min(900., a_rhoh*diam(ir)**b_rhoh) ! the hydr. density changes with the size
+      enddo
+      if ( ithread==0 ) lfirst = .false.
+    endif
     Allocate(lambda(nd))
     !
     alphap1=1.d0+alpha
@@ -1714,37 +1721,34 @@
     !
     fck=fc**k
 
-!   gamma1 = gamma_r8((1.d0+alpha)/(3.d0*mu))
-!   gamma4 = gamma_r8((4.d0+alpha)/(3.d0*mu))
-! 
-!   IF(rhoa > 0.0 .and. q > 0.0) THEN
-!     lamda = ((gamma4/gamma1)*dble(pi/6.*rhox)*dble(Ntx)/(dble(rhoa)*  &
-!         dble(q)))**mu
-!   ELSE
-!     lamda = 0.d0
-!   END IF
-! 
-!   N0 = 3*mu*dble(Ntx)*lamda**(0.5d0*((1.d0+alpha)/(3*mu)))*                         &
-!               (1.d0/gamma1)*lamda**(0.5d0*((1.d0+alpha))/(3*mu))
-! 
+    IF ( isc == 4 ) THEN ! snow 
+    ! eq. A1 in Mansell et al. 2010 uses volume, which assumes a constant density, so restore the 
+    ! mass variable instead, with dm/dD = am*bm*diam(ir)**(bm-1.0) (instead of pi/2*d^2 )
+    ntx = qnhydro*rho_d
+    xbar = qhydro/qnhydro
+    masstot = 0.0d0
 
-
-!   gamma1 = gamma_r8((1.d0+alpha)/(3.d0*mu))
-!   gamma4 = gamma_r8((4.d0+alpha)/(3.d0*mu))
-! 
-!   IF(rhoa > 0.0 .and. q > 0.0) THEN
-!     lamda = ((gamma4/gamma1)*dble(pi/6.*rhox)*dble(Ntx)/(dble(rhoa)*  &
-!           dble(q)))**mu
-!   ELSE
-!     lamda = 0.d0
-!   END IF
-
+    do ir = 1,nd
+    NN(ir) = am*bm*diam(ir)**(bm-1.0)*(dexp(-((am*diam(ir)**bm*gamma_nup2)/(gamma_nup1*xbar)))*ntx*   &
+           (gamma_nup1/gamma_nup2)**(-nus-1)*((am*diam(ir)**bm)/xbar)**nus)/(gamma_nup1*xbar)
+    NN(ir) = ddiam*NN(ir)
+    masstot = masstot + nn(ir)*am*diam(ir)**bm
+      fvel(ir) = av * (diam(ir))**bv * fck  ! m/s
+    enddo
+!      IF ( qhydro*rho_d > 0.001 ) THEN
+!        write(*,*) 'snow mass in/out, xbar,dbar = ',qhydro*rho_d,masstot,xbar*1.e6, 1.e3*(xbar/am)**(1./bm)
+!        do ir = 1,nd
+!        write(6,*) 'ir,dia,rhos = ',ir,diam(ir),rho(ir),nn(ir)
+!        enddo
+!      ENDIF
+    ELSE
     do ir=1,nd
       NN(ir)=qnhydro*rho_d * nu/gamma_alphap1 * lambda(ir)**(nu*alphap1) * &
              diam(ir)**(nu*alphap1-1.d0)*dexp(-(lambda(ir)*diam(ir))**nu) ! 1/m^4
       NN(ir)=NN(ir)*ddiam   ! in m-3
       fvel(ir) = av * (diam(ir))**bv * fck  ! m/s
     enddo
+    ENDIF
   
     Deallocate(lambda)
     !
